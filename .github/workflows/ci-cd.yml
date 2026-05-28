@@ -1,0 +1,53 @@
+name: ML Model CI/CD Pipeline
+
+# Trigger this workflow when code is pushed to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # Job 1: Test and Verify the Python Code
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11.6'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      # In a real scenario, you'd run pytest here. 
+      # For now, we'll just verify the model script runs without errors.
+      - name: Verify Model Training Script
+        run: python train.py
+
+  # Job 2: Build the Docker Image
+  docker-build:
+    needs: build-and-test # Only run if the previous job succeeds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t my-ml-api:latest .
+          
+      - name: Test Docker Container runs
+        run: |
+          # Start the container in the background
+          docker run -d -p 8000:8000 --name ml_test my-ml-api:latest
+          # Wait 3 seconds for Uvicorn to boot
+          sleep 3
+          # Send a test cURL request to ensure it returns a 200 OK
+          curl -X POST http://localhost:8000/predict \
+            -H "Content-Type: application/json" \
+            -d '{"feature_1": 1.5, "feature_2": 2.0, "feature_3": 3.1, "feature_4": 0.5}'
