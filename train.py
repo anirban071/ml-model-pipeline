@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 class ModelTrainer:
     def __init__(self, model_path: str = "model.pkl"):
         self.model_path = model_path
-        self.model = RandomForestClassifier(n_estimators=50, random_state=42)
+        self.model = RandomForestClassifier(n_estimators=100, random_state=42)
 
     def generate_data(self):
         # 4 features: e.g., age, income, transaction_amount, credit_score
