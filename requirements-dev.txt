@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest
+# Starlette bundled with fastapi 0.103.1 is incompatible with httpx>=0.28
+httpx<0.28

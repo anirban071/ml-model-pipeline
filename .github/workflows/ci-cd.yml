@@ -22,12 +22,14 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          
-      # In a real scenario, you'd run pytest here. 
-      # For now, we'll just verify the model script runs without errors.
+          pip install -r requirements-dev.txt
+
       - name: Verify Model Training Script
         run: python train.py
+
+      # Runs after train.py so model.pkl exists for the API tests
+      - name: Run Tests
+        run: pytest -v
 
   # Job 2: Build the Docker Image
   docker-build:
