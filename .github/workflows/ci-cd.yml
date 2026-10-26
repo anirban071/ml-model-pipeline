@@ -53,3 +53,30 @@ jobs:
           curl -X POST http://localhost:8000/predict \
             -H "Content-Type: application/json" \
             -d '{"feature_1": 1.5, "feature_2": 2.0, "feature_3": 3.1, "feature_4": 0.5}'
+
+  # Job 3: Push the tested image to GitHub Container Registry
+  push-image:
+    needs: docker-build # Only publish if build and smoke test passed
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Lets the workflow push to ghcr.io
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
