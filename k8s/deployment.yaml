@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-model-api
+  labels:
+    app: ml-model-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ml-model-api
+  template:
+    metadata:
+      labels:
+        app: ml-model-api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/anirban071/ml-model-pipeline:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          # Traffic is sent only once the app accepts connections
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          # Container is restarted if it stops responding
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
