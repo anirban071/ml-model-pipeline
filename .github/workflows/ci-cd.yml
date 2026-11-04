@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Adds a manual "Run workflow" button in the Actions tab
 
 jobs:
   # Job 1: Test and Verify the Python Code
