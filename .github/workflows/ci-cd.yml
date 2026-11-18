@@ -10,13 +10,13 @@ on:
 jobs:
   # Job 1: Test and Verify the Python Code
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11.6'
 
@@ -35,10 +35,10 @@ jobs:
   # Job 2: Build the Docker Image
   docker-build:
     needs: build-and-test # Only run if the previous job succeeds
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build Docker Image
         run: |
@@ -58,7 +58,8 @@ jobs:
   # Job 3: Push the tested image to GitHub Container Registry
   push-image:
     needs: docker-build # Only publish if build and smoke test passed
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' # Manual runs from other branches never publish
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write # Lets the workflow push to ghcr.io
@@ -85,7 +86,8 @@ jobs:
   # Job 4: Point the Kubernetes manifest at the new image; Argo CD deploys it
   update-manifest:
     needs: push-image
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
     permissions:
       contents: write # Lets the workflow commit the updated manifest
     steps:
