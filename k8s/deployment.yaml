@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/anirban071/ml-model-pipeline:62559f49270400cb12810a3801a392cd85b046cb
+          image: ghcr.io/anirban071/ml-model-pipeline:273b559188ef5ca40aeb20accdf823b6aaddafbc
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
